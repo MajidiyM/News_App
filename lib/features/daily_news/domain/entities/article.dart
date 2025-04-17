@@ -14,7 +14,6 @@ class ArticleEntity extends Equatable {
       this.urlToImage, this.publishedAt, this.content);
 
   @override
-  // TODO: implement props
   List<Object?> get props {
     return [
       id,
