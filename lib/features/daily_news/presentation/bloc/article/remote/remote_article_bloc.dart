@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
@@ -16,15 +18,32 @@ class RemoteArticleBloc extends Bloc<RemoteArticleEvent, RemoteArticleState> {
     on<GetArticles>(onGetArticles);
   }
 
-  void onGetArticles(
+  Future<void> onGetArticles(
       GetArticles event, Emitter<RemoteArticleState> emit) async {
-    final dataState = await _getArticleUseCase();
+    log('[RemoteArticleBloc] GetArticles event received');
 
-    if (dataState is DataSuccess && dataState.data!.isNotEmpty) {
+    emit(const RemoteArticlesLoading());
+    log('[RemoteArticleBloc] Loading state emitted');
+
+    final dataState = await _getArticleUseCase();
+    log('[RemoteArticleBloc] DataState received: $dataState');
+
+    if (dataState is DataSuccess &&
+        dataState.data != null &&
+        dataState.data!.isNotEmpty) {
+      log('[RemoteArticleBloc] Success: ${dataState.data!.length} articles loaded');
       emit(RemoteArticlesDone(dataState.data!));
-    }
-    if (dataState is DataFailed) {
+    } else if (dataState is DataFailed) {
+      log('[RemoteArticleBloc] Error: ${dataState.error}');
       emit(RemoteArticlesError(dataState.error!));
+    } else {
+      log('[RemoteArticleBloc] No articles found');
+      emit(RemoteArticlesError(
+        DioException(
+          requestOptions: RequestOptions(path: '/top-headlines'),
+          error: 'No articles found',
+        ),
+      ));
     }
   }
 }
