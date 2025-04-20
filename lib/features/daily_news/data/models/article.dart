@@ -2,7 +2,6 @@ import 'package:news_app/features/daily_news/domain/entities/article.dart';
 
 class ArticleModel extends ArticleEntity {
   ArticleModel(
-    super.id,
     super.author,
     super.title,
     super.description,
@@ -14,7 +13,6 @@ class ArticleModel extends ArticleEntity {
 
   factory ArticleModel.fromJson(Map<String, dynamic> map) {
     return ArticleModel(
-      map['id'] ?? "",
       map['author'] ?? "",
       map['title'] ?? "",
       map['description'] ?? "",
